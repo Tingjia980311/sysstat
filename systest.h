@@ -53,7 +53,7 @@
 #define __uname(m)		uname(m)
 #define __statvfs(m,n)		statvfs(m,n)
 #define __getenv(m)		getenv(m)
-#define __alarm(m)		ualarm(m)
+#define __alarm(m)		ualarm(m, 0)
 #define __pause()		pause()
 #define __stat(m,n)		stat(m,n)
 #define __opendir(m)		opendir(m)
