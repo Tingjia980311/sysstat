@@ -20,7 +20,7 @@
  */
 
 /* Number of activities */
-#define NR_ACT		42
+#define NR_ACT		43
 /* The value below is used for sanity check */
 #define MAX_NR_ACT	256
 
@@ -70,7 +70,7 @@
 #define A_PSI_CPU	40
 #define A_PSI_IO	41
 #define A_PSI_MEM	42
-
+#define A_MEMORY_CONTAINER	43
 
 /* Macro used to flag an activity that should be collected */
 #define COLLECT_ACTIVITY(m)	act[get_activity_position(act, m, EXIT_IF_NOT_FOUND)]->options |= AO_COLLECTED
@@ -1400,6 +1400,8 @@ __read_funct_t wrap_read_paging
 __read_funct_t wrap_read_io
 	(struct activity *);
 __read_funct_t wrap_read_meminfo
+	(struct activity *);
+__read_funct_t wrap_read_meminfo_container
 	(struct activity *);
 __read_funct_t wrap_read_kernel_tables
 	(struct activity *);

@@ -30,6 +30,8 @@ __print_funct_t print_io_stats
 	(struct activity *, int, int, unsigned long long);
 __print_funct_t print_memory_stats
 	(struct activity *, int, int, unsigned long long);
+__print_funct_t print_container_memory_stats
+	(struct activity *, int, int, unsigned long long);
 __print_funct_t print_ktables_stats
 	(struct activity *, int, int, unsigned long long);
 __print_funct_t print_queue_stats
@@ -103,6 +105,8 @@ __print_funct_t print_psimem_stats
 
 /* Functions used to display average statistics */
 __print_funct_t print_avg_memory_stats
+	(struct activity *, int, int, unsigned long long);
+__print_funct_t print_avg_container_memory_stats
 	(struct activity *, int, int, unsigned long long);
 __print_funct_t print_avg_ktables_stats
 	(struct activity *, int, int, unsigned long long);

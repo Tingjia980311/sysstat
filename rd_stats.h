@@ -213,6 +213,16 @@ struct stats_memory {
 #define STATS_MEMORY_UL		0
 #define STATS_MEMORY_U		0
 
+struct stats_memory_container {
+	unsigned long long tlmkb;
+	unsigned long long usedkb;
+};
+
+#define STATS_MEMORY_CONTAINER_SIZE	(sizeof(struct stats_memory_container))
+#define STATS_MEMORY_CONTAINER_ULL		2
+#define STATS_MEMORY_CONTAINER_UL		0
+#define STATS_MEMORY_CONTAINER_U		0
+
 /* Structure for kernel tables statistics */
 struct stats_ktables {
 	unsigned long long file_used;
@@ -764,6 +774,8 @@ __nr_t read_stat_cpu
 	(struct stats_cpu *, __nr_t);
 __nr_t read_stat_irq
 	(struct stats_irq *, __nr_t);
+__nr_t read_meminfo_container
+	(struct stats_memory_container *);
 __nr_t read_meminfo
 	(struct stats_memory *);
 void read_uptime

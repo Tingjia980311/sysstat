@@ -28,6 +28,8 @@ __print_funct_t raw_print_io_stats
 	(struct activity *, char *, int);
 __print_funct_t raw_print_memory_stats
 	(struct activity *, char *, int);
+__print_funct_t raw_print_container_memory_stats
+	(struct activity *, char *, int);
 __print_funct_t raw_print_ktables_stats
 	(struct activity *, char *, int);
 __print_funct_t raw_print_queue_stats

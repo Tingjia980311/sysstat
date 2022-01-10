@@ -27,6 +27,8 @@ __print_funct_t pcp_print_io_stats
 	(struct activity *, int);
 __print_funct_t pcp_print_memory_stats
 	(struct activity *, int);
+__print_funct_t pcp_print_container_memory_stats
+	(struct activity *, int);
 __print_funct_t pcp_print_ktables_stats
 	(struct activity *, int);
 __print_funct_t pcp_print_queue_stats

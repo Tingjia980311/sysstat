@@ -140,6 +140,14 @@ struct stats_memory_8a {
 
 #define STATS_MEMORY_8A_SIZE	(sizeof(struct stats_memory_8a))
 
+/* Structure stats_memory_container for ACTIVITY_MAGIC_BASE format */
+struct stats_memory_container_8a {
+	unsigned long tlmkb		__attribute__ ((aligned (8)));
+	unsigned long usedkb	__attribute__ ((aligned (8)));
+};
+
+#define STATS_MEMORY_CONTAINER_8A_SIZE	(sizeof(struct stats_memory_container_8a))
+
 /* Structure stats_ktables for ACTIVITY_MAGIC_BASE */
 struct stats_ktables_8a {
 	unsigned int file_used		__attribute__ ((aligned (4)));

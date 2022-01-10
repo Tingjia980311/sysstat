@@ -155,6 +155,9 @@
 /* Define SP_VALUE() to normalize to % */
 #define SP_VALUE(m,n,p)		(((double) ((n) - (m))) / (p) * 100)
 
+#define SQ_VALUE(m,p)		(((double) ( (m) )) / (p) * 100)
+
+
 /*
  * Under very special circumstances, STDOUT may become unavailable.
  * This is what we try to guess here.

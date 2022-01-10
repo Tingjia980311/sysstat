@@ -578,6 +578,32 @@ __print_funct_t xml_print_memory_stats(struct activity *a, int curr, int tab,
 	xprintf(tab, "</memory>");
 }
 
+__print_funct_t xml_print_container_memory_stats(struct activity *a, int curr, int tab,
+				       unsigned long long itv)
+{
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+
+	xprintf(tab, "<memory unit=\"kB\">");
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+
+
+		xprintf(++tab, "<memTotal>%llu</memTotal>",
+			smc->tlmkb);
+
+		xprintf(tab, "<used>%llu</used>",
+			smc->usedkb);
+
+		xprintf(tab, "<memused-percent>%.2f</memused-percent>",
+			smc->tlmkb ?
+			SQ_VALUE(smc->usedkb, smc->tlmkb) :
+			0.0);
+	}
+
+	xprintf(tab, "</memory>");
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in XML.

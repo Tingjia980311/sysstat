@@ -344,6 +344,52 @@ struct activity io_act = {
 	.bitmap		= NULL
 };
 
+struct activity container_memory_act = {
+	.id		= A_MEMORY_CONTAINER,
+	.options	= AO_COLLECTED + AO_MULTIPLE_OUTPUTS,
+	.magic		= ACTIVITY_MAGIC_BASE + 1,
+	.group		= G_DEFAULT,
+#ifdef SOURCE_SADC
+	.f_count_index	= -1,
+	.f_count2_index	= -1,
+	.f_read		= wrap_read_meminfo_container,
+#endif
+#ifdef SOURCE_SAR
+	.f_print	= print_container_memory_stats,
+	.f_print_avg	= print_avg_container_memory_stats,
+#endif
+#if defined(SOURCE_SAR) || defined(SOURCE_SADF)
+	.hdr_line	= "kbmemtotal;kbmemused;%memused",
+#endif
+	.gtypes_nr	= {STATS_MEMORY_CONTAINER_ULL, STATS_MEMORY_CONTAINER_UL, STATS_MEMORY_CONTAINER_U},
+	.ftypes_nr	= {0, 0, 0},
+#ifdef SOURCE_SADF
+	.f_render	= render_container_memory_stats,
+	.f_xml_print	= xml_print_container_memory_stats,
+	.f_json_print	= json_print_container_memory_stats,
+	.f_svg_print	= svg_print_container_memory_stats,
+	.f_raw_print	= raw_print_container_memory_stats,
+	.f_pcp_print	= pcp_print_container_memory_stats,
+	.f_count_new	= NULL,
+	.item_list	= NULL,
+	.desc		= "Memory for containerand/or swap utilization",
+#endif
+	.name		= "A_MEMORY_CONTAINER",
+	.item_list_sz	= 0,
+	.g_nr		= 0,
+	.nr_ini		= 1,
+	.nr2		= 1,
+	.nr_max		= 1,
+	.nr		= {1, 1, 1},
+	.nr_allocated	= 0,
+	.fsize		= STATS_MEMORY_CONTAINER_SIZE,
+	.msize		= STATS_MEMORY_CONTAINER_SIZE,
+	.opt_flags	= 0,
+	.buf		= {NULL, NULL, NULL},
+	.bitmap		= NULL
+};
+
+
 /* Memory and swap space utilization activity */
 struct activity memory_act = {
 	.id		= A_MEMORY,
@@ -2083,6 +2129,7 @@ struct activity *act[NR_ACT] = {
 	/* <psi> */
 	&psi_cpu_act,
 	&psi_io_act,
-	&psi_mem_act	/* AO_CLOSE_MARKUP */
+	&psi_mem_act,	/* AO_CLOSE_MARKUP */
+	&container_memory_act
 	/* </psi> */
 };

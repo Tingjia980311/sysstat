@@ -587,6 +587,30 @@ __print_funct_t json_print_memory_stats(struct activity *a, int curr, int tab,
 	printf("}");
 }
 
+
+__print_funct_t json_print_container_memory_stats(struct activity *a, int curr, int tab,
+					unsigned long long itv)
+{
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+
+
+	xprintf0(tab, "\"memory\": {");
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+
+		printf("\"memfree\": %llu, "
+		       "\"memused\": %llu, "
+		       "\"memused-percent\": %.2f, ",
+		       smc->tlmkb,
+		       smc->usedkb,
+		       smc->tlmkb ?
+		       SQ_VALUE(smc->usedkb, smc->tlmkb) : 0.0);
+	}
+
+	printf("}");
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in JSON.

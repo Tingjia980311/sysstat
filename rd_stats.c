@@ -225,6 +225,24 @@ __nr_t read_stat_irq(struct stats_irq *st_irq, __nr_t nr_alloc)
 	return irq_read;
 }
 
+__nr_t read_meminfo_container(struct stats_memory_container *st_memory) {
+	FILE *fp_total;
+	FILE *fp_used;
+	char line_total[128];
+	char line_used[128];
+
+	if ((fp_total = fopen("/sys/fs/cgroup/memory/docker/05750d1c1a91bba7d606a5dece4e0d6b03d6cafb17288468a9d9cb2ed996a140/memory.limit_in_bytes", "r")) == NULL )
+		return 0;
+	if ((fp_used = fopen("/sys/fs/cgroup/memory/docker/05750d1c1a91bba7d606a5dece4e0d6b03d6cafb17288468a9d9cb2ed996a140/memory.usage_in_bytes", "r")) == NULL )
+		return 0;
+	if (fgets(line_total, sizeof(line_total), fp_total) == NULL)
+		return 0;
+	if (fgets(line_used, sizeof(line_used), fp_used) == NULL)
+		return 0;
+	sscanf(line_total, "%llu", &st_memory->tlmkb);
+	sscanf(line_used, "%llu", &st_memory->usedkb);
+}
+
 /*
  ***************************************************************************
  * Read memory statistics from /proc/meminfo.

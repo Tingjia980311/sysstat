@@ -29,6 +29,8 @@ __print_funct_t xml_print_io_stats
 	(struct activity *, int, int, unsigned long long);
 __print_funct_t xml_print_memory_stats
 	(struct activity *, int, int, unsigned long long);
+__print_funct_t xml_print_container_memory_stats
+	(struct activity *, int, int, unsigned long long);
 __print_funct_t xml_print_ktables_stats
 	(struct activity *, int, int, unsigned long long);
 __print_funct_t xml_print_queue_stats

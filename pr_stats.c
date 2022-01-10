@@ -681,6 +681,64 @@ void stub_print_memory_stats(struct activity *a, int prev, int curr, int dispavg
 	}
 }
 
+void stub_print_container_memory_stats(struct activity *a, int prev, int curr, int dispavg)
+{
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+	static unsigned long long
+		avg_tlmkb       = 0,
+		avg_usedkb		= 0;
+	int unit = NO_UNIT;
+
+	if (DISPLAY_UNIT(flags)) {
+		/* Default values unit is kB */
+		unit = UNIT_KILOBYTE;
+	}
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+		if (dish) {
+			print_hdr_line(timestamp[!curr], a, FIRST, 0, 9);
+		}
+		printf("%-11s", timestamp[curr]);
+
+		if (!dispavg) {
+			/* Display instantaneous values */
+			cprintf_u64(unit, 2, 9,
+				    (unsigned long long) smc->tlmkb,
+				    (unsigned long long) smc->usedkb);
+			cprintf_pc(DISPLAY_UNIT(flags), 1, 9, 2,
+				   smc->tlmkb ?
+				   SQ_VALUE(smc->usedkb, smc->tlmkb)
+				   : 0.0);
+
+			printf("\n");
+
+			/*
+			 * Will be used to compute the average.
+			 * We assume that the total amount of memory installed can not vary
+			 * during the interval given on the command line.
+			 */
+			avg_tlmkb       += smc->tlmkb;
+			avg_usedkb      += smc->usedkb;
+
+		}
+		else {
+			/* Display average values */
+			cprintf_f(unit, 2, 9, 0,
+				  (double) avg_tlmkb / avg_count,
+				  (double) avg_usedkb / avg_count);
+			cprintf_pc(DISPLAY_UNIT(flags), 1, 9, 2,
+				   smc->tlmkb ?
+				   SQ_VALUE((double) (avg_usedkb ),  smc->tlmkb)
+				   : 0.0);
+			printf("\n");
+
+			/* Reset average counters */
+			avg_tlmkb = avg_usedkb = 0;
+		}
+	}
+}
+
 /*
  ***************************************************************************
  * Display memory and swap statistics.
@@ -698,6 +756,12 @@ __print_funct_t print_memory_stats(struct activity *a, int prev, int curr,
 	stub_print_memory_stats(a, prev, curr, FALSE);
 }
 
+__print_funct_t print_container_memory_stats(struct activity *a, int prev, int curr,
+				   unsigned long long itv)
+{
+	stub_print_container_memory_stats(a, prev, curr, FALSE);
+}
+
 /*
  ***************************************************************************
  * Display average memory statistics.
@@ -713,6 +777,12 @@ __print_funct_t print_avg_memory_stats(struct activity *a, int prev, int curr,
 				       unsigned long long itv)
 {
 	stub_print_memory_stats(a, prev, curr, TRUE);
+}
+
+__print_funct_t print_avg_container_memory_stats(struct activity *a, int prev, int curr,
+				       unsigned long long itv)
+{
+	stub_print_container_memory_stats(a, prev, curr, TRUE);
 }
 
 /*

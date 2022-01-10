@@ -869,6 +869,33 @@ __print_funct_t render_memory_stats(struct activity *a, int isdb, char *pre,
 	}
 }
 
+
+__print_funct_t render_container_memory_stats(struct activity *a, int isdb, char *pre,
+				    int curr, unsigned long long itv)
+{
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+
+
+		render(isdb, pre, PT_USEINT,
+		       "-\tkbmemtotal", NULL, NULL,
+		       smc->tlmkb, DNOVAL, NULL);
+
+		render(isdb, pre, PT_USEINT,
+		       "-\tkbmemused", NULL, NULL,
+		       smc->usedkb, DNOVAL, NULL);
+
+		render(isdb, pre, PT_NOFLAG,
+		       "-\t%memused", NULL, NULL, NOVAL,
+		       smc->tlmkb ?
+		       SQ_VALUE(smc->usedkb, smc->tlmkb) :
+		       0.0, NULL);
+
+	}
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in selected format.

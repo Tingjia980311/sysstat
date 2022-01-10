@@ -185,6 +185,17 @@ __read_funct_t wrap_read_meminfo(struct activity *a)
 	return;
 }
 
+__read_funct_t wrap_read_meminfo_container(struct activity *a)
+{
+	struct stats_memory_container *st_memory
+		= (struct stats_memory_container *) a->_buf0;
+
+	/* Read memory stats */
+	read_meminfo_container(st_memory);
+
+	return;
+}
+
 /*
  ***************************************************************************
  * Read swapping statistics.

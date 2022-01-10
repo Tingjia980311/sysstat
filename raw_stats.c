@@ -398,6 +398,21 @@ __print_funct_t raw_print_memory_stats(struct activity *a, char *timestr, int cu
 	}
 }
 
+
+__print_funct_t raw_print_container_memory_stats(struct activity *a, char *timestr, int curr)
+{
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+		printf("%s; %s; %llu;", timestr, pfield(a->hdr_line, FIRST), smc->tlmkb);
+		printf(" %s; %llu;", pfield(NULL, 0), smc->usedkb);
+		pfield(NULL, 0); /* Skip %memused */
+		printf("\n");
+	}
+
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in raw format.

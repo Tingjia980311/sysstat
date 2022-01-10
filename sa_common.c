@@ -2286,7 +2286,7 @@ int parse_sar_opt(char *argv[], int *opt, struct activity *act[],
 			break;
 
 		case 'r':
-			p = get_activity_position(act, A_MEMORY, EXIT_IF_NOT_FOUND);
+			p = get_activity_position(act, A_MEMORY_CONTAINER, EXIT_IF_NOT_FOUND);
 			act[p]->options   |= AO_SELECTED;
 			act[p]->opt_flags |= AO_F_MEMORY;
 			if (!*(argv[*opt] + i + 1) && argv[*opt + 1] && !strcmp(argv[*opt + 1], K_ALL)) {

@@ -418,6 +418,29 @@ __print_funct_t pcp_print_memory_stats(struct activity *a, int curr)
 #endif	/* HAVE_PCP */
 }
 
+__print_funct_t pcp_print_container_memory_stats(struct activity *a, int curr)
+{
+#ifdef HAVE_PCP
+	char buf[64];
+	struct stats_memory_container
+		*smc = (struct stats_memory_container *) a->buf[curr];
+
+	if (DISPLAY_MEMORY(a->opt_flags)) {
+
+		snprintf(buf, sizeof(buf), "%lu", (unsigned long) (smc->tlmkb >> 10));
+		pmiPutValue("hinv.physmem", NULL, buf);
+
+		snprintf(buf, sizeof(buf), "%llu", smc->tlmkb);
+		pmiPutValue("mem.physmem", NULL, buf);
+
+		snprintf(buf, sizeof(buf), "%llu", smc->usedkb);
+		pmiPutValue("mem.util.used", NULL, buf);
+
+	}
+
+#endif	/* HAVE_PCP */
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in PCP format.

@@ -1930,6 +1930,12 @@ __print_funct_t svg_print_memory_stats(struct activity *a, int curr, int action,
 	}
 }
 
+
+__print_funct_t svg_print_container_memory_stats(struct activity *a, int curr, int action, struct svg_parm *svg_p,
+				       unsigned long long itv, struct record_header *record_hdr)
+{
+}
+
 /*
  ***************************************************************************
  * Display kernel tables statistics in SVG.
