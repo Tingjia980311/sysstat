@@ -107,10 +107,12 @@ struct stats_cpu {
 	unsigned long long cpu_softirq;
 	unsigned long long cpu_guest;
 	unsigned long long cpu_guest_nice;
+	unsigned long long cpu_container_user;
+	unsigned long long cpu_container_sys;
 };
 
 #define STATS_CPU_SIZE	(sizeof(struct stats_cpu))
-#define STATS_CPU_ULL	10
+#define STATS_CPU_ULL	12
 #define STATS_CPU_UL	0
 #define STATS_CPU_U	0
 

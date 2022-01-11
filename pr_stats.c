@@ -151,7 +151,7 @@ __print_funct_t print_cpu_stats(struct activity *a, int prev, int curr,
 	 */
 	if (a->nr_ini > 1) {
 		deltot_jiffies = get_global_cpu_statistics(a, prev, curr,
-							   flags, offline_cpu_bitmap);
+							   flags, offline_cpu_bitmap) * 10;
 	}
 
 	/*
@@ -187,7 +187,7 @@ __print_funct_t print_cpu_stats(struct activity *a, int prev, int curr,
 				 * This is a UP machine. In this case
 				 * interval has still not been calculated.
 				 */
-				deltot_jiffies = get_per_cpu_interval(scc, scp);
+				deltot_jiffies = get_per_cpu_interval(scc, scp) * 10;
 			}
 			if (!deltot_jiffies) {
 				/* CPU "all" cannot be tickless */
@@ -198,7 +198,7 @@ __print_funct_t print_cpu_stats(struct activity *a, int prev, int curr,
 			cprintf_in(IS_INT, " %7d", "", i - 1);
 
 			/* Recalculate interval for current proc */
-			deltot_jiffies = get_per_cpu_interval(scc, scp);
+			deltot_jiffies = get_per_cpu_interval(scc, scp) * 10;
 
 			if (!deltot_jiffies) {
 				/*
@@ -227,17 +227,9 @@ __print_funct_t print_cpu_stats(struct activity *a, int prev, int curr,
 		}
 
 		if (DISPLAY_CPU_DEF(a->opt_flags)) {
-			cprintf_pc(DISPLAY_UNIT(flags), 6, 9, 2,
-				   ll_sp_value(scp->cpu_user, scc->cpu_user, deltot_jiffies),
-				   ll_sp_value(scp->cpu_nice, scc->cpu_nice, deltot_jiffies),
-				   ll_sp_value(scp->cpu_sys + scp->cpu_hardirq + scp->cpu_softirq,
-					       scc->cpu_sys + scc->cpu_hardirq + scc->cpu_softirq,
-					       deltot_jiffies),
-				   ll_sp_value(scp->cpu_iowait, scc->cpu_iowait, deltot_jiffies),
-				   ll_sp_value(scp->cpu_steal, scc->cpu_steal, deltot_jiffies),
-				   scc->cpu_idle < scp->cpu_idle ?
-				   0.0 :
-				   ll_sp_value(scp->cpu_idle, scc->cpu_idle, deltot_jiffies));
+			cprintf_pc(DISPLAY_UNIT(flags), 2, 9, 2,
+				   ll_sp_value(scp->cpu_container_user, scc->cpu_container_user, deltot_jiffies),
+				   ll_sp_value(scp->cpu_container_sys, scc->cpu_container_sys, deltot_jiffies));
 			printf("\n");
 		}
 		else if (DISPLAY_CPU_ALL(a->opt_flags)) {
@@ -729,12 +721,12 @@ void stub_print_container_memory_stats(struct activity *a, int prev, int curr, i
 				  (double) avg_usedkb / avg_count);
 			cprintf_pc(DISPLAY_UNIT(flags), 1, 9, 2,
 				   smc->tlmkb ?
-				   SQ_VALUE((double) (avg_usedkb ),  smc->tlmkb)
+				   SQ_VALUE((double) (avg_usedkb ),  avg_tlmkb)
 				   : 0.0);
 			printf("\n");
 
 			/* Reset average counters */
-			avg_tlmkb = avg_usedkb = 0;
+			// avg_tlmkb = avg_usedkb = 0;
 		}
 	}
 }

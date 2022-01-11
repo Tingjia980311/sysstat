@@ -82,7 +82,7 @@ struct activity cpu_act = {
 	.f_print_avg	= print_cpu_stats,
 #endif
 #if defined(SOURCE_SAR) || defined(SOURCE_SADF)
-	.hdr_line	= "CPU;%user;%nice;%system;%iowait;%steal;%idle|"
+	.hdr_line	= "CPU;%user;%system|"
 		          "CPU;%usr;%nice;%sys;%iowait;%steal;%irq;%soft;%guest;%gnice;%idle",
 #endif
 	.gtypes_nr	= {STATS_CPU_ULL, STATS_CPU_UL, STATS_CPU_U},
