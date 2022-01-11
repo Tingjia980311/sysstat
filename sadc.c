@@ -1204,6 +1204,7 @@ int main(int argc, char **argv)
 	int stdfd = 0, ofd = -1;
 	int restart_mark;
 	long count = 0;
+	int p;
 
 #ifdef TEST
 	fprintf(stderr, "TEST MODE\n");
@@ -1231,12 +1232,17 @@ int main(int argc, char **argv)
 #endif
 
 	while (++opt < argc) {
-
 		if (!strcmp(argv[opt], "-S")) {
 			if (!argv[++opt]) {
 				usage(argv[0]);
 			}
 			parse_sadc_S_option(argv, opt);
+		} else if (!strcmp(argv[opt], "-CONTAINER")) {
+			opt++;
+			p = get_activity_position(act, A_CPU, EXIT_IF_NOT_FOUND);
+			strcpy(act[p]->container_id, argv[opt]);
+			p = get_activity_position(act, A_MEMORY_CONTAINER, EXIT_IF_NOT_FOUND);
+			strcpy(act[p]->container_id, argv[opt]);
 		}
 
 		else if (!strcmp(argv[opt], "-D")) {

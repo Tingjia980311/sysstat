@@ -72,7 +72,7 @@ __read_funct_t wrap_read_stat_cpu(struct activity *a)
 
 	/* Read CPU statistics */
 	do {
-		nr_read = read_stat_cpu(st_cpu, a->nr_allocated);
+		nr_read = read_stat_cpu(st_cpu, a->nr_allocated, a->container_id);
 
 		if (nr_read < 0) {
 			/* Buffer needs to be reallocated */
@@ -191,7 +191,7 @@ __read_funct_t wrap_read_meminfo_container(struct activity *a)
 		= (struct stats_memory_container *) a->_buf0;
 
 	/* Read memory stats */
-	read_meminfo_container(st_memory);
+	read_meminfo_container(st_memory, a->container_id);
 
 	return;
 }

@@ -1111,6 +1111,7 @@ struct activity {
 	 * if @bitmap is not NULL.
 	 */
 	struct act_bitmap *bitmap;
+	char container_id[128];
 };
 
 

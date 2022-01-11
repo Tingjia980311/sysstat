@@ -773,11 +773,11 @@ void compute_ext_disk_stats
 unsigned long long get_per_cpu_interval
 	(struct stats_cpu *, struct stats_cpu *);
 __nr_t read_stat_cpu
-	(struct stats_cpu *, __nr_t);
+	(struct stats_cpu *, __nr_t, char *);
 __nr_t read_stat_irq
 	(struct stats_irq *, __nr_t);
 __nr_t read_meminfo_container
-	(struct stats_memory_container *);
+	(struct stats_memory_container *, char *);
 __nr_t read_meminfo
 	(struct stats_memory *);
 void read_uptime

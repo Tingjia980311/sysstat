@@ -928,7 +928,7 @@ void read_stats(int curr)
 		exit(4);
 	}
 	/* Read statistics for CPUs "all" */
-	read_stat_cpu(st_cpu, 1);
+	read_stat_cpu(st_cpu, 1, "");
 
 	/*
 	 * Compute the total number of jiffies spent by all processors.

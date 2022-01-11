@@ -70,7 +70,7 @@ struct stats_psi {
  * where some CPU are offline and located at the end of the list.
  ***************************************************************************
  */
-__nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc)
+__nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc, char * container_id)
 {
 	FILE *fp;
 	FILE *fp_user, *fp_sys;
@@ -79,6 +79,14 @@ __nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc)
 	char line[8192];
 	char line_user[128];
 	char line_sys[128];
+	char userfile[128] = "/sys/fs/cgroup/cpu/docker/";
+	char sysfile[128] = "/sys/fs/cgroup/cpu/docker/";
+	strcat(userfile, container_id);
+	strcat(userfile, "/cpuacct.usage_user");
+	
+	strcat(sysfile, container_id);
+	strcat(sysfile, "/cpuacct.usage_sys");
+
 	int proc_nr;
 	__nr_t cpu_read = 0;
 
@@ -159,11 +167,11 @@ __nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc)
 	}
 
 
-	if (( fp_user = fopen("/sys/fs/cgroup/cpu/docker/bf2f5d148fa12aedb8a4059172de28c5fac55124039a52782cc77a27d8ca3307/cpuacct.usage_user", "r") ) == NULL) {
+	if (( fp_user = fopen(userfile, "r") ) == NULL) {
 		fprintf(stderr, _("Cannot open %s: %s\n"), STAT, strerror(errno));
 		exit(2);
 	}
-	if (( fp_sys = fopen("/sys/fs/cgroup/cpu/docker/bf2f5d148fa12aedb8a4059172de28c5fac55124039a52782cc77a27d8ca3307/cpuacct.usage_sys", "r") ) == NULL) {
+	if (( fp_sys = fopen(sysfile, "r") ) == NULL) {
 		fprintf(stderr, _("Cannot open %s: %s\n"), STAT, strerror(errno));
 		exit(2);
 	}
@@ -262,15 +270,26 @@ __nr_t read_stat_irq(struct stats_irq *st_irq, __nr_t nr_alloc)
 	return irq_read;
 }
 
-__nr_t read_meminfo_container(struct stats_memory_container *st_memory) {
+__nr_t read_meminfo_container(struct stats_memory_container *st_memory, char * container_id) {
 	FILE *fp_total;
 	FILE *fp_used;
 	char line_total[128];
 	char line_used[128];
+	char usedfile[128] = "/sys/fs/cgroup/memory/docker/";
+	char totalfile[128] = "/sys/fs/cgroup/memory/docker/";
+	strcat(totalfile, container_id);
+	strcat(totalfile, "/memory.limit_in_bytes");
+	
+	strcat(usedfile, container_id);
+	strcat(usedfile, "/memory.usage_in_bytes");
 
-	if ((fp_total = fopen("/sys/fs/cgroup/memory/docker/bf2f5d148fa12aedb8a4059172de28c5fac55124039a52782cc77a27d8ca3307/memory.limit_in_bytes", "r")) == NULL )
+	fprintf(stderr, _("Cannot open %s: %s\n"), usedfile, strerror(errno));
+
+
+
+	if ((fp_total = fopen(totalfile, "r")) == NULL )
 		return 0;
-	if ((fp_used = fopen("/sys/fs/cgroup/memory/docker/bf2f5d148fa12aedb8a4059172de28c5fac55124039a52782cc77a27d8ca3307/memory.usage_in_bytes", "r")) == NULL )
+	if ((fp_used = fopen(usedfile, "r")) == NULL )
 		return 0;
 	if (fgets(line_total, sizeof(line_total), fp_total) == NULL)
 		return 0;

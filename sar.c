@@ -1310,6 +1310,11 @@ int main(int argc, char **argv)
 		if (!strcmp(argv[opt], "--sadc")) {
 			/* Locate sadc */
 			which_sadc();
+		} else if (!strncmp(argv[opt], "--container=", 12)) {
+			char *t = argv[opt];
+			salloc(args_idx++, "-CONTAINER");
+			salloc(args_idx++, t + 12);
+			opt++;
 		}
 
 		else if (!strncmp(argv[opt], "--dev=", 6)) {
