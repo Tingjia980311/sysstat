@@ -3109,8 +3109,6 @@ unsigned long long get_global_cpu_statistics(struct activity *a, int prev, int c
 	 * Also look for offline CPU: They won't be displayed, and some of their values may
 	 * have to be modified.
 	 */
-	unsigned long long scc_user_container = scc_all -> cpu_container_user;
-	unsigned long long scp_user_container = scp_all -> cpu_container_user;
 	if (a->nr_ini > 1) {
 		memset(scc_all, 0, sizeof(struct stats_cpu));
 		memset(scp_all, 0, sizeof(struct stats_cpu));
@@ -3215,9 +3213,6 @@ unsigned long long get_global_cpu_statistics(struct activity *a, int prev, int c
 
 		scc_all->cpu_guest_nice += scc->cpu_guest_nice;
 		scp_all->cpu_guest_nice += scp->cpu_guest_nice;
-
-		scp_all->cpu_container_user = scp_user_container;
-		scc_all->cpu_container_user = scc_user_container;
 	}
 
 	return deltot_jiffies;

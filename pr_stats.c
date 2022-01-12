@@ -123,138 +123,30 @@ void print_hdr_line(char *p_timestamp, struct activity *a, int pos, int iwidth, 
 __print_funct_t print_cpu_stats(struct activity *a, int prev, int curr,
 				unsigned long long itv)
 {
-	int i;
-	unsigned long long deltot_jiffies = 1;
-	struct stats_cpu *scc, *scp;
-	unsigned char offline_cpu_bitmap[BITMAP_SIZE(NR_CPUS)] = {0};
-
+	struct stats_cpu_container *scc, *scp;
+	
 	if (dish) {
 		print_hdr_line(timestamp[!curr], a, FIRST + DISPLAY_CPU_ALL(a->opt_flags), 7, 9);
 	}
 
-	/*
-	 * @nr[curr] cannot normally be greater than @nr_ini
-	 * (since @nr_ini counts up all CPU, even those offline).
-	 * If this happens, it may be because the machine has been
-	 * restarted with more CPU and no LINUX_RESTART has been
-	 * inserted in file.
-	 * No problem here with @nr_allocated. Having been able to
-	 * read @nr[curr] structures shows that buffers are large enough.
-	 */
 	if (a->nr[curr] > a->nr_ini) {
 		a->nr_ini = a->nr[curr];
 	}
 
-	/*
-	 * Compute CPU "all" as sum of all individual CPU (on SMP machines)
-	 * and look for offline CPU.
-	 */
-	if (a->nr_ini > 1) {
-		deltot_jiffies = get_global_cpu_statistics(a, prev, curr,
-							   flags, offline_cpu_bitmap) * 10;
-	}
+	scc = (struct stats_cpu_container *) ((char *) a->buf[curr] );
+	scp = (struct stats_cpu_container *) ((char *) a->buf[prev] );
 
-	/*
-	 * Now display CPU statistics (including CPU "all"),
-	 * except for offline CPU or CPU that the user doesn't want to see.
-	 */
-	for (i = 0; (i < a->nr_ini) && (i < a->bitmap->b_size + 1); i++) {
+	printf("%-11s", timestamp[curr]);
 
-		/*
-		 * Should current CPU (including CPU "all") be displayed?
-		 * Note: @nr[curr] is in [1, NR_CPUS + 1].
-		 * Bitmap size is provided for (NR_CPUS + 1) CPUs.
-		 * Anyway, NR_CPUS may vary between the version of sysstat
-		 * used by sadc to create a file, and the version of sysstat
-		 * used by sar to read it...
-		 */
-		if (!(a->bitmap->b_array[i >> 3] & (1 << (i & 0x07))) ||
-		    offline_cpu_bitmap[i >> 3] & (1 << (i & 0x07)))
-			/* Don't display CPU */
-			continue;
+	/* This is CPU "all" */
+	cprintf_in(IS_STR, " %s", "    all", 0);
 
-		scc = (struct stats_cpu *) ((char *) a->buf[curr] + i * a->msize);
-		scp = (struct stats_cpu *) ((char *) a->buf[prev] + i * a->msize);
+	cprintf_pc(DISPLAY_UNIT(flags), 2, 9, 2,
+			ll_sp_value(scp->cpu_container_user, scc->cpu_container_user, (scc->read - scp->read)) / 100,
+			ll_sp_value(scp->cpu_container_sys, scc->cpu_container_sys, (scc->read - scp->read)) / 100 );
+	printf("\n");
 
-		printf("%-11s", timestamp[curr]);
-
-		if (i == 0) {
-			/* This is CPU "all" */
-			cprintf_in(IS_STR, " %s", "    all", 0);
-
-			if (a->nr_ini == 1) {
-				/*
-				 * This is a UP machine. In this case
-				 * interval has still not been calculated.
-				 */
-				deltot_jiffies = get_per_cpu_interval(scc, scp) * 10;
-			}
-			if (!deltot_jiffies) {
-				/* CPU "all" cannot be tickless */
-				deltot_jiffies = 1;
-			}
-		}
-		else {
-			cprintf_in(IS_INT, " %7d", "", i - 1);
-
-			/* Recalculate interval for current proc */
-			deltot_jiffies = get_per_cpu_interval(scc, scp) * 10;
-
-			if (!deltot_jiffies) {
-				/*
-				 * If the CPU is tickless then there is no change in CPU values
-				 * but the sum of values is not zero.
-				 * %user, %nice, %system, %iowait, %steal, ..., %idle
-				 */
-				cprintf_pc(DISPLAY_UNIT(flags), 5, 9, 2,
-					   0.0, 0.0, 0.0, 0.0, 0.0);
-
-				if (DISPLAY_CPU_DEF(a->opt_flags)) {
-					cprintf_pc(DISPLAY_UNIT(flags), 1, 9, 2, 100.0);
-					printf("\n");
-				}
-				/*
-				 * Four additional fields to display:
-				 * %irq, %soft, %guest, %gnice.
-				 */
-				else if (DISPLAY_CPU_ALL(a->opt_flags)) {
-					cprintf_pc(DISPLAY_UNIT(flags), 5, 9, 2,
-						   0.0, 0.0, 0.0, 0.0, 100.0);
-					printf("\n");
-				}
-				continue;
-			}
-		}
-
-		if (DISPLAY_CPU_DEF(a->opt_flags)) {
-			cprintf_pc(DISPLAY_UNIT(flags), 2, 9, 2,
-				   ll_sp_value(scp->cpu_container_user, scc->cpu_container_user, deltot_jiffies),
-				   ll_sp_value(scp->cpu_container_sys, scc->cpu_container_sys, deltot_jiffies));
-			printf("\n");
-		}
-		else if (DISPLAY_CPU_ALL(a->opt_flags)) {
-			cprintf_pc(DISPLAY_UNIT(flags), 10, 9, 2,
-				   (scc->cpu_user - scc->cpu_guest) < (scp->cpu_user - scp->cpu_guest) ?
-				   0.0 :
-				   ll_sp_value(scp->cpu_user - scp->cpu_guest,
-					       scc->cpu_user - scc->cpu_guest, deltot_jiffies),
-					       (scc->cpu_nice - scc->cpu_guest_nice) < (scp->cpu_nice - scp->cpu_guest_nice) ?
-				   0.0 :
-				   ll_sp_value(scp->cpu_nice - scp->cpu_guest_nice,
-					       scc->cpu_nice - scc->cpu_guest_nice, deltot_jiffies),
-				   ll_sp_value(scp->cpu_sys, scc->cpu_sys, deltot_jiffies),
-				   ll_sp_value(scp->cpu_iowait, scc->cpu_iowait, deltot_jiffies),
-				   ll_sp_value(scp->cpu_steal, scc->cpu_steal, deltot_jiffies),
-				   ll_sp_value(scp->cpu_hardirq, scc->cpu_hardirq, deltot_jiffies),
-				   ll_sp_value(scp->cpu_softirq, scc->cpu_softirq, deltot_jiffies),
-				   ll_sp_value(scp->cpu_guest, scc->cpu_guest, deltot_jiffies),
-				   ll_sp_value(scp->cpu_guest_nice, scc->cpu_guest_nice, deltot_jiffies),
-				   scc->cpu_idle < scp->cpu_idle ?
-				   0.0 :
-				   ll_sp_value(scp->cpu_idle, scc->cpu_idle, deltot_jiffies));
-			printf("\n");
-		}
-	}
+	
 }
 
 /*

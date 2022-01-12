@@ -85,7 +85,7 @@ struct activity cpu_act = {
 	.hdr_line	= "CPU;%user;%system|"
 		          "CPU;%usr;%nice;%sys;%iowait;%steal;%irq;%soft;%guest;%gnice;%idle",
 #endif
-	.gtypes_nr	= {STATS_CPU_ULL, STATS_CPU_UL, STATS_CPU_U},
+	.gtypes_nr	= {STATS_CPU_CONTAINER_ULL, STATS_CPU_CONTAINER_UL, STATS_CPU_CONTAINER_U},
 	.ftypes_nr	= {0, 0, 0},
 #ifdef SOURCE_SADF
 	.f_render	= render_cpu_stats,
@@ -106,8 +106,8 @@ struct activity cpu_act = {
 	.nr_max		= NR_CPUS + 1,
 	.nr		= {-1, -1, -1},
 	.nr_allocated	= 0,
-	.fsize		= STATS_CPU_SIZE,
-	.msize		= STATS_CPU_SIZE,
+	.fsize		= STATS_CPU_CONTAINER_SIZE,
+	.msize		= STATS_CPU_CONTAINER_SIZE,
 	.opt_flags	= AO_F_CPU_DEF,
 	.buf		= {NULL, NULL, NULL},
 	.bitmap		= &cpu_bitmap

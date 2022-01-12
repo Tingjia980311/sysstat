@@ -1992,7 +1992,7 @@ void rw_io_stat_loop(long int count, struct tm *rectime)
 		read_uptime(&(uptime_cs[curr]));
 
 		/* Read stats for CPU "all" */
-		read_stat_cpu(st_cpu[curr], 1, "");
+		read_stat_cpu(st_cpu[curr], 1);
 
 		/*
 		 * Compute the total number of jiffies spent by all processors.

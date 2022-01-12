@@ -72,12 +72,7 @@ __read_funct_t wrap_read_stat_cpu(struct activity *a)
 
 	/* Read CPU statistics */
 	do {
-		nr_read = read_stat_cpu(st_cpu, a->nr_allocated, a->container_id);
-
-		if (nr_read < 0) {
-			/* Buffer needs to be reallocated */
-			st_cpu = (struct stats_cpu *) reallocate_buffer(a);
-		}
+		nr_read = read_stat_cpu_container(st_cpu, a->nr_allocated, a->container_id);
 	}
 	while (nr_read < 0);
 

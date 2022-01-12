@@ -1926,7 +1926,7 @@ void rw_mpstat_loop(int dis_hdr, int rows)
 
 	/* Read system uptime and CPU stats */
 	read_uptime(&(uptime_cs[0]));
-	read_stat_cpu(st_cpu[0], cpu_nr + 1, "");
+	read_stat_cpu(st_cpu[0], cpu_nr + 1);
 
 	/*
 	 * Calculate global CPU stats as the sum of individual ones.
@@ -2037,7 +2037,7 @@ void rw_mpstat_loop(int dis_hdr, int rows)
 
 		/* Read uptime and CPU stats */
 		read_uptime(&(uptime_cs[curr]));
-		read_stat_cpu(st_cpu[curr], cpu_nr + 1, "");
+		read_stat_cpu(st_cpu[curr], cpu_nr + 1);
 
 		/* Read system topology */
 		if (DISPLAY_CPU(actflags) && DISPLAY_TOPOLOGY(flags)) {

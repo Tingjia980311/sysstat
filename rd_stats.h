@@ -96,6 +96,7 @@
  * In activity buffer: First structure is for global CPU utilisation ("all").
  * Following structures are for each individual CPU (0, 1, etc.)
  */
+
 struct stats_cpu {
 	unsigned long long cpu_user;
 	unsigned long long cpu_nice;
@@ -107,14 +108,23 @@ struct stats_cpu {
 	unsigned long long cpu_softirq;
 	unsigned long long cpu_guest;
 	unsigned long long cpu_guest_nice;
-	unsigned long long cpu_container_user;
-	unsigned long long cpu_container_sys;
 };
 
 #define STATS_CPU_SIZE	(sizeof(struct stats_cpu))
-#define STATS_CPU_ULL	12
+#define STATS_CPU_ULL	10
 #define STATS_CPU_UL	0
 #define STATS_CPU_U	0
+
+struct stats_cpu_container {
+	unsigned long long cpu_container_user;
+	unsigned long long cpu_container_sys;
+	long long int read;
+};
+
+#define STATS_CPU_CONTAINER_SIZE	(sizeof(struct stats_cpu))
+#define STATS_CPU_CONTAINER_ULL	3
+#define STATS_CPU_CONTAINER_UL	0
+#define STATS_CPU_CONTAINER_U	0
 
 /*
  * Structure for task creation and context switch statistics.
@@ -773,7 +783,9 @@ void compute_ext_disk_stats
 unsigned long long get_per_cpu_interval
 	(struct stats_cpu *, struct stats_cpu *);
 __nr_t read_stat_cpu
-	(struct stats_cpu *, __nr_t, char *);
+	(struct stats_cpu *, __nr_t);
+__nr_t read_stat_cpu_container
+	(struct stats_cpu_container *, __nr_t, char *);
 __nr_t read_stat_irq
 	(struct stats_irq *, __nr_t);
 __nr_t read_meminfo_container

@@ -30,6 +30,9 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
+#include <sys/timeb.h>  /* ftime, timeb (for timestamp in millisecond) */
+
+
 #include "common.h"
 #include "rd_stats.h"
 
@@ -70,23 +73,13 @@ struct stats_psi {
  * where some CPU are offline and located at the end of the list.
  ***************************************************************************
  */
-__nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc, char * container_id)
+
+__nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc)
 {
 	FILE *fp;
-	FILE *fp_user, *fp_sys;
 	struct stats_cpu *st_cpu_i;
 	struct stats_cpu sc;
 	char line[8192];
-	char line_user[128];
-	char line_sys[128];
-	char userfile[128] = "/sys/fs/cgroup/cpu/docker/";
-	char sysfile[128] = "/sys/fs/cgroup/cpu/docker/";
-	strcat(userfile, container_id);
-	strcat(userfile, "/cpuacct.usage_user");
-	
-	strcat(sysfile, container_id);
-	strcat(sysfile, "/cpuacct.usage_sys");
-
 	int proc_nr;
 	__nr_t cpu_read = 0;
 
@@ -166,6 +159,32 @@ __nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc, char * container
 		}
 	}
 
+	fclose(fp);
+	return cpu_read;
+}
+
+
+__nr_t read_stat_cpu_container(struct stats_cpu_container *st_cpu, __nr_t nr_alloc, char * container_id)
+{
+	FILE *fp;
+	FILE *fp_user, *fp_sys;
+	char line_user[128];
+	char line_sys[128];
+	char userfile[128] = "/sys/fs/cgroup/cpu/docker/";
+	char sysfile[128] = "/sys/fs/cgroup/cpu/docker/";
+	struct timeb timer_msec;
+	long long int timestamp_msec; /* timestamp in millisecond. */
+	strcat(userfile, container_id);
+	strcat(userfile, "/cpuacct.usage_user");
+
+	strcat(sysfile, container_id);
+	strcat(sysfile, "/cpuacct.usage_sys");
+
+	if ((fp = fopen(STAT, "r")) == NULL) {
+		fprintf(stderr, _("Cannot open %s: %s\n"), STAT, strerror(errno));
+		exit(2);
+	}
+	memset(st_cpu, 0, STATS_CPU_SIZE);
 
 	if (( fp_user = fopen(userfile, "r") ) == NULL) {
 		fprintf(stderr, _("Cannot open %s: %s\n"), STAT, strerror(errno));
@@ -174,6 +193,14 @@ __nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc, char * container
 	if (( fp_sys = fopen(sysfile, "r") ) == NULL) {
 		fprintf(stderr, _("Cannot open %s: %s\n"), STAT, strerror(errno));
 		exit(2);
+	}
+
+	if (!ftime(&timer_msec)) {
+		timestamp_msec = ((long long int) timer_msec.time) * 1000ll + 
+		                (long long int) timer_msec.millitm;
+	}
+	else {
+		timestamp_msec = -1;
 	}
 
 	if (fgets(line_user, sizeof(line_user), fp_user) == NULL) {
@@ -185,23 +212,24 @@ __nr_t read_stat_cpu(struct stats_cpu *st_cpu, __nr_t nr_alloc, char * container
 		exit(2);
 	}
 	if (strlen(line_user) > 8) {
-		line_user[strlen(line_user) - 7] = '\0';
+		line_user[strlen(line_user) - 5] = '\0';
 		sscanf((line_user), "%llu", &st_cpu->cpu_container_user);
 	} else {
 		st_cpu->cpu_container_user = 0;
 	}
 	if (strlen(line_sys) > 8) {
-		line_sys[strlen(line_user) - 7] = '\0';
+		line_sys[strlen(line_user) - 5] = '\0';
 		sscanf((line_sys), "%llu", &st_cpu->cpu_container_sys);
 	} else {
 		st_cpu->cpu_container_sys = 0;
 	}
 
+	st_cpu->read = timestamp_msec;
 
 	fclose(fp);
 	fclose(fp_sys);
 	fclose(fp_user);
-	return cpu_read;
+	return 1;
 }
 
 /*
