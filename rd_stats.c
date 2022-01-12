@@ -279,13 +279,8 @@ __nr_t read_meminfo_container(struct stats_memory_container *st_memory, char * c
 	char totalfile[128] = "/sys/fs/cgroup/memory/docker/";
 	strcat(totalfile, container_id);
 	strcat(totalfile, "/memory.limit_in_bytes");
-	
 	strcat(usedfile, container_id);
 	strcat(usedfile, "/memory.usage_in_bytes");
-
-	fprintf(stderr, _("Cannot open %s: %s\n"), usedfile, strerror(errno));
-
-
 
 	if ((fp_total = fopen(totalfile, "r")) == NULL )
 		return 0;
