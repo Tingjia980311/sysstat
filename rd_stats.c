@@ -273,18 +273,26 @@ __nr_t read_stat_irq(struct stats_irq *st_irq, __nr_t nr_alloc)
 __nr_t read_meminfo_container(struct stats_memory_container *st_memory, char * container_id) {
 	FILE *fp_total;
 	FILE *fp_used;
+	FILE *fp_cache;
+	unsigned long long cachekb;
 	char line_total[128];
 	char line_used[128];
+	char line_cache[128];
 	char usedfile[128] = "/sys/fs/cgroup/memory/docker/";
 	char totalfile[128] = "/sys/fs/cgroup/memory/docker/";
+	char cachefile[128] = "/sys/fs/cgroup/memory/docker/";
 	strcat(totalfile, container_id);
 	strcat(totalfile, "/memory.limit_in_bytes");
 	strcat(usedfile, container_id);
 	strcat(usedfile, "/memory.usage_in_bytes");
+	strcat(cachefile, container_id);
+	strcat(cachefile, "/memory.stat");
 
 	if ((fp_total = fopen(totalfile, "r")) == NULL )
 		return 0;
 	if ((fp_used = fopen(usedfile, "r")) == NULL )
+		return 0;
+	if ((fp_cache = fopen(cachefile, "r")) == NULL )
 		return 0;
 	if (fgets(line_total, sizeof(line_total), fp_total) == NULL)
 		return 0;
@@ -295,8 +303,21 @@ __nr_t read_meminfo_container(struct stats_memory_container *st_memory, char * c
 	sscanf(line_used, "%llu", &st_memory->usedkb);
 	st_memory->usedkb = st_memory->usedkb >> 10;
 
+
+
+	while (fgets(line_cache, sizeof(line_cache), fp_cache) != NULL) {
+
+		if (!strncmp(line_cache, "inactive_file", 13)) {
+			sscanf(line_cache + 14, "%llu", &cachekb);
+			cachekb = cachekb >> 10;
+			break;
+		}
+	}
+	st_memory->usedkb -= cachekb;
+
 	fclose(fp_total);
 	fclose(fp_used);
+	fclose(fp_cache);
 	return 1;
 }
 
